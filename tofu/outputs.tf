@@ -18,3 +18,8 @@ output "postgres_connection_string" {
   value       = "postgresql://postgres:${var.postgres_password}@localhost:${var.postgres_port}/app"
   sensitive   = true
 }
+
+output "postgres_postgres_password" {
+  value     = random_password.postgres.result
+  sensitive = true
+}

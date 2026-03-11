@@ -22,3 +22,13 @@ variable "postgres_port" {
   type        = number
   default     = 5432
 }
+
+variable "postgrest_port" {
+  type    = number
+  default = 80
+}
+
+variable "k3d_localhost_dns" {
+  type    = string
+  default = "host.k3d.internal"
+}

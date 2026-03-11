@@ -1,6 +1,7 @@
 # OpenTofu / Terraform
 tofu/.terraform/
 tofu/.terraform.lock.hcl
-tofu/terraform.tfstate
-tofu/terraform.tfstate.backup
+tofu/terraform.tfstate*
+tofu/terraform.tfstate.backup*
 tofu/*.tf~
+kubeconfig

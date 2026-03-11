@@ -31,6 +31,17 @@ Install Argo CD into the k3d cluster by following the instructions in the `argoc
 Please add commits to your fork of the repo to answer this problem.
 Note: the use of the word `postgrest` is confusing, but correct - this is a project that we're going to deploy.
 
+> During initial boostrap the **first target onto k3d cluster and postgres** to initialise them first. As we are facing egg and chicken dilema, where some terraform providers require upstream services to be ready.
+
+![](img/issues.png)
+
+
+```sh
+cd tofu
+terraform apply --target='terraform_data.k3d_cluster' --target='docker_container.postgres'
+terraform apply 
+```
+
 ## Add a user to the database
 
 Please add a super user to the postgrest database.
@@ -53,3 +64,49 @@ Use a kubernetes job to inject some data into the postgres database
 ## Provide an expected screenshot
 
 Update this file, README.md, with a screenshot of what we should see when we visit the URL after following your instructions - this should show us the data you have injected.
+
+### Kubernetes SQL injection job output
+
+**NOTE:** Some initial failed jobs are expected due to `host.k3d.internal` DNS resolution errors
+
+```bash
+psql: error: could not translate host name "host.k3d.internal" to address: Name or service not known
+```
+
+![](img/k8s-psql-job.png)
+
+### PostgREST API
+
+Go to [http://localhost:8080/users]() in the browser
+
+![](img/postgrest.png)
+
+
+### Areas of improvement
+
+- split `tofu` terraform module into
+    - `k3d` - boostraps empty k3d cluster
+    - `k8s-config`- manages k8s resources
+    - `postgres` - boostraps empty postgres container
+    - `postgres-config` - manages postgres resources
+
+- in case of missing data in PostgREST please enable [schema cache reloading](https://docs.postgrest.org/en/v14/references/schema_cache.html#schema-cache-reloading)
+
+![](img/schema-cache.png)
+
+
+## Destroy
+
+```sh
+terraform state rm kubernetes_config_map_v1.psql_job
+terraform state rm kubernetes_deployment_v1.postgrest
+terraform state rm kubernetes_job_v1.psql_job
+terraform state rm kubernetes_namespace_v1.postgrest
+terraform state rm kubernetes_secret_v1.postgrest
+terraform state rm kubernetes_secret_v1.psql_job
+terraform state rm kubernetes_service_v1.postgrest
+terraform state rm kubernetes_ingress_v1.postgrest
+terraform state rm postgresql_role.postgres
+
+terraform destroy
+```
